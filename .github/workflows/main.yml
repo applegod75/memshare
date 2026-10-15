@@ -1,0 +1,59 @@
+
+
+name: build
+
+on:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+            - ubuntu-latest
+            - windows-latest
+            - macos-latest
+
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: clone the memshare library
+        uses: actions/checkout@v4
+
+      - name: install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install gcc -y
+          sudo apt update -y && sudo apt upgrade -y
+          sudo apt install cmake -y
+
+      - name: install dependencies
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install cmake -y
+          brew install gcc -y
+
+      - name: install dependencies
+        if: matrix.os == 'windows-latest'
+        run: |
+          winget install kitware.cmake
+          winget install BrechtSanders.WinLibs
+
+      - name: create build folder
+        if: matrix.os == 'windows-latest'
+        run: if not exist build mkdir build
+
+      - name: create build folder
+        if: matrix.os == 'ubuntu-latest'
+        run: mkdir -p build
+
+      - name: create build folder
+        if: matrix.os == 'macos-latest'
+        run: mkdir -p build
+
+      - name: build project
+        run: |
+          cmake -B build -DCMAKE_C_COMPILER=gcc -G "MinGW Makefiles"
+          cmake --build build
+
+

@@ -1,0 +1,5 @@
+
+# build folder
+**/build/**
+# local lsp config
+compile_commands.json
