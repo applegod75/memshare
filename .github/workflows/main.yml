@@ -19,41 +19,47 @@ jobs:
       - name: clone the memshare library
         uses: actions/checkout@v4
 
-      - name: install dependencies
+      - name: install deps on ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update -y
           sudo apt-get install gcc -y
           sudo apt update -y && sudo apt upgrade -y
           sudo apt install cmake -y
-
-      - name: install dependencies
+      - name: install deps on macOS
         if: matrix.os == 'macos-latest'
         run: |
           brew install cmake -y
           brew install gcc -y
-
-      - name: install dependencies
+      - name: install deps on windows
         if: matrix.os == 'windows-latest'
         run: |
-          winget install kitware.cmake
-          winget install BrechtSanders.WinLibs
+          winget install LLVM.LLVM --accept-package-agreements --accept-source-agreements
+          winget install Ninja-build.Ninja --accept-package-agreements --accept-source-agreements
 
-      - name: create build folder
+      - name: create build folder on windows
         if: matrix.os == 'windows-latest'
-        run: if not exist build mkdir build
-
-      - name: create build folder
+        run: mkdir build
+      - name: create build folder on ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: mkdir -p build
-
-      - name: create build folder
+      - name: create build folder on macOS
         if: matrix.os == 'macos-latest'
         run: mkdir -p build
 
       - name: build project
+        if: matrix.os == 'windows-latest'
         run: |
-          cmake -B build -DCMAKE_C_COMPILER=gcc -G "MinGW Makefiles"
+          cmake -B build -DCMAKE_C_COMPILER=clang -G "Ninja"
           cmake --build build
-
+      - name: build project
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cmake -B build -DCMAKE_C_COMPILER=gcc -G "Unix Makefiles"
+          cmake --build build
+      - name: build project
+        if: matrix.os == 'macos-latest'
+        run: |
+          cmake -B build -DCMAKE_C_COMPILER=gcc -G "Unix Makefiles"
+          cmake --build build
 

@@ -16,7 +16,7 @@ void* ms_internal_writeBucket(void* mem, size_t size){
     // initialize the entire bucket to 64-byte pebbles
     buck.largest = 64;
     // start the bucket unlocked.
-    buck.lock = false;
+    buck.lock = 0;
     
     memcpy(mem, &buck, sizeof(struct Bucket));
     
